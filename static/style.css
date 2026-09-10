@@ -1,0 +1,699 @@
+/* ==========================================
+   SANDFLOW - GLOBAL
+   ========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px 40px;
+
+    min-height: 100vh;
+
+    background-color: #0f172a;
+
+    color: #e2e8f0;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+/* ==========================================
+   HEADER
+   ========================================== */
+
+h1 {
+    margin: 0;
+
+    font-size: 36px;
+    font-weight: 700;
+
+    color: #ffffff;
+}
+
+body > p {
+    margin-top: 5px;
+    margin-bottom: 35px;
+
+    font-size: 15px;
+
+    color: #94a3b8;
+}
+
+
+/* ==========================================
+   SECTION TITLES
+   ========================================== */
+
+h2 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #f8fafc;
+}
+
+
+/* ==========================================
+   CONTROL PANEL
+   ========================================== */
+
+.control-panel {
+    display: grid;
+
+    grid-template-columns:
+        1.6fr
+        0.6fr
+        1fr
+        auto;
+
+    gap: 20px;
+
+    align-items: end;
+
+    padding: 22px 28px;
+
+    margin-bottom: 35px;
+
+    background-color: #1e293b;
+
+    border: 1px solid #334155;
+    border-radius: 12px;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Pad folder uses full width */
+.folder-group {
+    grid-column: 1 / -1;
+}
+
+
+/* Individual control groups */
+.control-group {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+/* Row inside a control group */
+.control-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+
+/* ==========================================
+   LABELS
+   ========================================== */
+
+.control-group label {
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #94a3b8;
+
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+
+/* ==========================================
+   TEXT INPUTS + SELECT
+   ========================================== */
+
+.control-group input[type="text"],
+.control-group select {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 12px;
+
+    background-color: #0f172a;
+    color: #f8fafc;
+
+    border: 1px solid #475569;
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+/* Placeholder */
+.control-group input[type="text"]::placeholder {
+    color: #64748b;
+}
+
+
+/* Focus state */
+.control-group input[type="text"]:focus,
+.control-group select:focus {
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.15);
+
+    background-color: #111c31;
+}
+
+
+/* ==========================================
+   BUTTONS
+   ========================================== */
+
+button {
+    height: 42px;
+
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 7px;
+
+    background-color: #3b82f6;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
+}
+
+
+button:hover {
+    background-color: #2563eb;
+
+    box-shadow:
+        0 5px 14px rgba(0, 0, 0, 0.25);
+}
+
+
+button:active {
+    transform: translateY(1px);
+}
+
+
+/* ==========================================
+   PAD FOLDER BUTTON
+   ========================================== */
+
+#choosePadFolder {
+    background-color: #334155;
+
+    border: 1px solid #475569;
+}
+
+
+#choosePadFolder:hover {
+    background-color: #475569;
+}
+
+
+/* ==========================================
+   PAD FOLDER NAME
+   ========================================== */
+
+#padFolderName {
+    margin-left: 4px;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   FILE INPUT
+   ========================================== */
+
+#ticketFile {
+    width: 100%;
+
+    color: #94a3b8;
+
+    font-family: inherit;
+    font-size: 14px;
+}
+
+
+#ticketFile::file-selector-button {
+    height: 42px;
+
+    margin-right: 10px;
+    padding: 0 18px;
+
+    border: 1px solid #475569;
+    border-radius: 7px;
+
+    background-color: #334155;
+    color: #f8fafc;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+#ticketFile::file-selector-button:hover {
+    background-color: #475569;
+    border-color: #64748b;
+}
+
+
+/* ==========================================
+   UPLOAD BUTTON
+   ========================================== */
+
+#uploadButton {
+    min-width: 120px;
+}
+
+
+/* ==========================================
+   GENERATE CSV BUTTON
+   ========================================== */
+
+#generateCSV {
+    margin-top: 16px;
+
+    background-color: #16a34a;
+}
+
+
+#generateCSV:hover {
+    background-color: #15803d;
+}
+
+
+/* ==========================================
+   TABULATOR CONTAINER
+   ========================================== */
+
+#resultsTable {
+    overflow: hidden;
+
+    border: 1px solid #334155;
+    border-radius: 10px;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+
+/* ==========================================
+   TABULATOR MAIN
+   ========================================== */
+
+.tabulator {
+    background-color: #111827;
+
+    border: none;
+
+    color: #e2e8f0;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+/* ==========================================
+   TABULATOR HEADER
+   ========================================== */
+
+.tabulator .tabulator-header {
+    background-color: #1e293b;
+
+    border-bottom: 1px solid #334155;
+
+    color: #f8fafc;
+
+    font-weight: 600;
+}
+
+
+.tabulator .tabulator-header
+.tabulator-col {
+    background-color: #1e293b;
+
+    border-right: 1px solid #334155;
+}
+
+
+.tabulator .tabulator-header
+.tabulator-col:hover {
+    background-color: #263449;
+}
+
+
+.tabulator .tabulator-header
+.tabulator-col
+.tabulator-col-content {
+    padding: 10px 8px;
+}
+
+
+/* ==========================================
+   TABULATOR ROWS
+   ========================================== */
+
+.tabulator .tabulator-tableholder
+.tabulator-table
+.tabulator-row {
+    min-height: 38px;
+
+    background-color: #111827;
+
+    border-bottom: 1px solid #1f2937;
+
+    color: #e2e8f0;
+
+    transition:
+        background-color 0.15s ease;
+}
+
+
+/* Alternating rows */
+.tabulator .tabulator-tableholder
+.tabulator-table
+.tabulator-row:nth-child(even) {
+    background-color: #172033;
+}
+
+
+/* Hover */
+.tabulator .tabulator-tableholder
+.tabulator-table
+.tabulator-row:hover {
+    background-color: #263449;
+}
+
+
+/* ==========================================
+   TABULATOR CELLS
+   ========================================== */
+
+.tabulator .tabulator-cell {
+    padding: 9px 8px;
+
+    border-right: 1px solid #253044;
+}
+
+
+/* ==========================================
+   TABULATOR EDITING
+   ========================================== */
+
+.tabulator .tabulator-cell.tabulator-editing {
+    background-color: #0f172a;
+
+    border: 1px solid #3b82f6 !important;
+}
+
+
+.tabulator .tabulator-cell input {
+    background-color: #0f172a;
+
+    color: #f8fafc;
+
+    border: none;
+
+    outline: none;
+
+    font-family: inherit;
+}
+
+
+/* ==========================================
+   SOURCE LINKS
+   ========================================== */
+
+.tabulator a {
+    color: #60a5fa;
+
+    font-weight: 500;
+
+    text-decoration: none;
+}
+
+
+.tabulator a:hover {
+    color: #93c5fd;
+
+    text-decoration: underline;
+}
+
+
+/* ==========================================
+   SCROLLBAR
+   ========================================== */
+
+.tabulator-tableholder::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+
+.tabulator-tableholder::-webkit-scrollbar-track {
+    background-color: #0f172a;
+}
+
+
+.tabulator-tableholder::-webkit-scrollbar-thumb {
+    background-color: #475569;
+
+    border-radius: 5px;
+}
+
+
+.tabulator-tableholder::-webkit-scrollbar-thumb:hover {
+    background-color: #64748b;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 1000px) {
+
+    body {
+        padding: 24px;
+    }
+
+
+    .control-panel {
+        grid-template-columns:
+            1fr
+            1fr;
+    }
+
+
+    .folder-group {
+        grid-column: 1 / -1;
+    }
+
+
+    .upload-group {
+        grid-column: 1 / -1;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    body {
+        padding: 18px;
+    }
+
+
+    h1 {
+        font-size: 30px;
+    }
+
+
+    .control-panel {
+        grid-template-columns: 1fr;
+
+        padding: 18px;
+    }
+
+
+    .folder-group,
+    .upload-group {
+        grid-column: auto;
+    }
+
+}
+.validation-modal {
+    display: none;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.7);
+
+    z-index: 1000;
+
+    align-items: center;
+    justify-content: center;
+}
+.validation-window {
+    width: 90%;
+    height: 90%;
+
+    background: #0f172a;
+
+    border: 1px solid #334155;
+    border-radius: 12px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+.validation-content {
+    flex: 1;
+
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+
+    min-height: 0;
+}
+.validation-ticket {
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px;
+
+    min-width: 0;
+    min-height: 0;
+}
+
+.validation-ticket h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#validationSource {
+    width: 100%;
+    flex: 1;
+
+    border: 1px solid #334155;
+    border-radius: 8px;
+
+    background: white;
+}
+.validation-fields {
+    padding: 20px;
+
+    display: grid;
+    grid-template-columns: 120px 1fr;
+
+    gap: 10px 12px;
+
+    align-content: start;
+}
+
+.validation-fields h3 {
+    grid-column: 1 / -1;
+
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.validation-fields label {
+    align-self: center;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.validation-fields input {
+    width: 100%;
+    height: 36px;
+
+    padding: 0 10px;
+
+    border: 1px solid #475569;
+    border-radius: 6px;
+
+    background: #0f172a;
+    color: #f8fafc;
+}
+.validation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 20px;
+    border-bottom: 1px solid #334155;
+}
+
+.validation-header h2 {
+    margin: 0;
+}
+
+#closeValidation {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+    color: #94a3b8;
+
+    border: none;
+    border-radius: 6px;
+
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#closeValidation:hover {
+    background: #dc2626;
+    color: white;
+}

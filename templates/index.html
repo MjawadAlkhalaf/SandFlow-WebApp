@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>SandFlow</title>
+
+    <!-- Tabulator CSS -->
+    <link
+        href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css"
+        rel="stylesheet"
+    >
+    <!-- SandFlow CSS -->
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+
+<body>
+
+    <h1>SandFlow</h1>
+
+    <p>Sand Ticket Processing & Tracking</p>
+
+
+    <!-- Ticket Upload -->
+        <!-- Control Panel -->
+    <div class="control-panel">
+
+        <!-- Pad Folder -->
+        <div class="control-group folder-group">
+
+            <label>Pad Folder</label>
+
+            <div class="control-row">
+                <button id="choosePadFolder">
+                    Choose Pad Folder
+                </button>
+
+                <span id="padFolderName">
+                    No folder selected
+                </span>
+            </div>
+
+        </div>
+
+
+        <!-- Ticket -->
+        <div class="control-group">
+
+            <label>Ticket Files</label>
+
+            <input
+                type="file"
+                id="ticketFile"
+                multiple
+            >
+
+        </div>
+
+
+        <!-- Silo -->
+        <div class="control-group">
+
+            <label for="silo">
+                Silo Number
+            </label>
+
+            <input
+                type="text"
+                id="silo"
+                name="silo"
+                placeholder="e.g. 2"
+            >
+
+        </div>
+
+
+        <!-- Sand Type -->
+        <div class="control-group">
+
+            <label for="sandType">
+                Sand Type
+            </label>
+
+            <select
+                name="sandType"
+                id="sandType"
+            >
+
+                <option value="100 Mesh Regional">
+                    100 Mesh Regional
+                </option>
+                <option value="100 Mesh">
+                    100 Mesh
+                </option>
+                <option value="Damp Sand">
+                    Damp Sand
+                </option>
+                <option value="40/140">
+                    40/140
+                </option>
+                <option value="40/70 Regional">
+                    40/70 Regional
+                </option>
+
+                <option value="40/70 White">
+                    40/70 White
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Upload -->
+        <div class="control-group upload-group">
+
+            <label>&nbsp;</label>
+
+            <button id="uploadButton">
+                Upload Ticket
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Results -->
+    <button id = "clearTable">Clear Table</button>
+    <h2>Results</h2>
+
+    <!--
+        Tabulator builds the entire table
+        inside this div.
+    -->
+
+    <div id="resultsTable"></div>
+
+    <button id = "Validate Tickets"> Validate Tickets</button>
+    <button id = "generateCSV"> Generate CSV</button>
+    
+
+    <!-- Ticket Validation Modal -->
+    <div id="validationModal" class="validation-modal">
+
+    <div class="validation-window">
+
+        <!-- Header -->
+        <div class="validation-header">
+
+            <h2 id="validationTitle">
+                Validate Ticket
+            </h2>
+
+            <button id="closeValidation" type="button">
+                ✕
+            </button>
+
+        </div>
+
+
+        <!-- Main Content -->
+        <div class="validation-content">
+
+            <!-- Left Side: Ticket Preview -->
+            <div class="validation-ticket">
+
+                <h3>Ticket</h3>
+
+                <iframe
+                    id="validationSource"
+                    title="Ticket Preview">
+                </iframe>
+
+            </div>
+
+
+            <!-- Right Side: Editable Ticket Information -->
+            <div class="validation-fields">
+
+                <h3>Ticket Information</h3>
+
+                <label for="validateSandType">Sand Type</label>
+                <input id="validateSandType" type="text">
+
+                <label for="validateCarrier">Carrier</label>
+                <input id="validateCarrier" type="text">
+
+                <label for="validateWeight">Weight</label>
+                <input id="validateWeight" type="text">
+
+                <label for="validateBol">BOL</label>
+                <input id="validateBol" type="text">
+
+                <label for="validateTruck">Truck</label>
+                <input id="validateTruck" type="text">
+
+                <label for="validatePo">PO</label>
+                <input id="validatePo" type="text">
+
+                <label for="validateFacility">Facility</label>
+                <input id="validateFacility" type="text">
+
+            </div>
+
+        </div>
+
+
+        <!-- Bottom Controls -->
+        <div class="validation-footer">
+
+            <button id="previousValidation" type="button">
+                Previous
+            </button>
+            <button id="nextValidation" type="button">
+                Next
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+    <!-- Tabulator JavaScript -->
+
+    <script
+        src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js">
+    </script>
+
+
+    <!-- SandFlow JavaScript -->
+
+    <script src="/static/app.js"></script>
+
+
+</body>
+
+</html>
