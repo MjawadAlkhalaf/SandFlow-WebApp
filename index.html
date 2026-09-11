@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SandFlow</title>
+
+    <link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<main class="app-shell">
+
+    <header class="app-header">
+        <div class="brand">
+            <h1>SandFlow</h1>
+            <p>Sand Ticket Processing &amp; Tracking</p>
+        </div>
+    </header>
+
+    <section class="control-panel">
+
+        <div class="control-group folder-group">
+            <label>Pad Folder</label>
+            <div class="folder-row">
+                <button id="choosePadFolder" type="button">Choose Pad Folder</button>
+                <div class="folder-path">
+                    <span id="padFolderName">No folder selected</span>
+                    <span class="folder-symbol" aria-hidden="true">⌑</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group ticket-group">
+            <label>Ticket Files</label>
+
+            <div id="ticketDropZone" class="ticket-drop-zone">
+                
+                <svg class="upload-cloud-icon" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 16l-4-4-4 4"></path>
+                    <path d="M12 12v9"></path>
+                    <path d="M20.4 17.5A5 5 0 0 0 18 8.2
+                            7 7 0 0 0 4.3 10.5
+                            4.5 4.5 0 0 0 5.5 19H7"></path>
+                </svg>
+                
+                <div class="drop-zone-content">
+                    <strong id="ticketFileName">Drag &amp; Drop Tickets Here</strong>
+                    <span class="drop-zone-or">or</span>
+
+                    <label for="ticketFile" class="browse-files-button">
+                        Browse Files
+                    </label>
+                </div>
+
+                <!-- Existing ID kept exactly the same for app.js -->
+                <input
+                    type="file"
+                    id="ticketFile"
+                    multiple
+                    accept=".jpg,.jpeg,.png,.pdf"
+                >
+            </div>
+        </div>
+
+        <div class="control-group silo-group">
+            <label for="silo">Silo Number</label>
+            <input type="text" id="silo" name="silo" placeholder="e.g. 2">
+        </div>
+
+        <div class="control-group sand-type-group">
+            <label for="sandType">Sand Type</label>
+            <select name="sandType" id="sandType">
+                <option value="100 Mesh Regional">100 Mesh Regional</option>
+                <option value="100 Mesh">100 Mesh</option>
+                <option value="Damp Sand">Damp Sand</option>
+                <option value="40/140">40/140</option>
+                <option value="40/70 Regional">40/70 Regional</option>
+                <option value="40/70 White">40/70 White</option>
+            </select>
+        </div>
+
+        <div class="control-group upload-group">
+            <label>&nbsp;</label>
+            <button id="uploadButton" type="button">
+                <svg class="button-icon" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 16V4"></path>
+                    <path d="M7 9l5-5 5 5"></path>
+                    <path d="M5 15v4h14v-4"></path>
+                </svg>
+                Upload Ticket
+            </button>
+        </div>
+
+    </section>
+
+    <section class="xiq-section">
+
+        <div id="csvDropZone" class="xiq-drop-zone">
+
+            <div class="xiq-main-row">
+
+                <svg class="upload-cloud-icon" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.7"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 16l-4-4-4 4"></path>
+                    <path d="M12 12v9"></path>
+                    <path d="M20.4 17.5A5 5 0 0 0 18 8.2
+                            7 7 0 0 0 4.3 10.5
+                            4.5 4.5 0 0 0 5.5 19H7"></path>
+                </svg>
+
+                <div class="xiq-text-area">
+                    <div class="xiq-text-row">
+                        <strong>Drag &amp; Drop CSV Here</strong>
+                        <span id="csvFileName">No file selected</span>
+                    </div>
+
+                    <label for="csvFile" class="browse-files-button">
+                        Browse CSV
+                    </label>
+
+                    <input type="file" id="csvFile" accept=".csv">
+                </div>
+
+            </div>
+
+            <button id="xiq-import" type="button">
+                Import CSV
+            </button>
+
+        </div>
+
+    </section>
+
+    <section class="results-section">
+        <div class="results-header">
+            <h2>Results</h2>
+
+            <div class="results-actions">
+                <button id="clearTable" type="button" class="button-secondary">🗑️ Clear Table</button>
+                <button id="Validate Tickets" type="button"><span class="check-icon">✓</span> Validate Tickets</button>
+                <button id="generateCSV" type="button">Generate CSV</button>
+            </div>
+        </div>
+
+        <div id="resultsTable"></div>
+    </section>
+
+    <div id="validationModal" class="validation-modal">
+        <div class="validation-window">
+
+            <div class="validation-header">
+                <div>
+                    <p class="modal-kicker">Ticket Review</p>
+                </div>
+
+                <button id="closeValidation" type="button" class="validation-close" aria-label="Close validation window">✕</button>
+            </div>
+
+            <div class="validation-content">
+                <div class="validation-ticket">
+                    <h3>Ticket</h3>
+                    <div class="ticket-preview-frame">
+                        <iframe id="validationSource" title="Ticket Preview"></iframe>
+                    </div>
+                </div>
+
+                <div class="validation-fields">
+                    <h3>Ticket Information</h3>
+
+                    <div class="validation-form">
+                        <div class="validation-field">
+                            <label for="validateSandType">Sand Type</label>
+                            <input id="validateSandType" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="validateCarrier">Carrier</label>
+                            <input id="validateCarrier" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="validateWeight">Weight</label>
+                            <input id="validateWeight" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="validateBol">BOL</label>
+                            <input id="validateBol" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="validateTruck">Truck</label>
+                            <input id="validateTruck" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="validatePo">PO</label>
+                            <input id="validatePo" type="text">
+                        </div>
+
+                        <div class="validation-field validation-field-full">
+                            <label for="validateFacility">Facility</label>
+                            <input id="validateFacility" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="validation-footer">
+                <button id="previousValidation" type="button" class="button-secondary">Previous</button>
+                <button id="nextValidation" type="button">Next</button>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+<script src="/static/app.js"></script>
+
+</body>
+</html>
