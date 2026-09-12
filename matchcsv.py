@@ -45,7 +45,7 @@ def matched_table(currTable, xiq_bols):
     unmatchedTable = []
 
     #looping through table rows
-    for row in range(0,len(currTable)):
+    for row in range(0,len(currTable),1):
 
         #initial row dictionary for unmatched values 
         unmatchedTemp = {}
@@ -74,7 +74,10 @@ def matched_table(currTable, xiq_bols):
             #appending final array
             unmatchedTable.append(unmatchedTemp)
 
-    return [matchedTable,unmatchedTable]
+    matchedTable_df = pd.DataFrame(matchedTable)
+    unmatchedTable_df = pd.DataFrame(matchedTable)
+
+    return [matchedTable_df,unmatchedTable_df]
 
 #Finding matched and unmatched rows in xiq export
 def matched_csv(csv_df,currTable_bols):
@@ -84,7 +87,7 @@ def matched_csv(csv_df,currTable_bols):
     unmatchedcsv = []
 
     #looping through table rows
-    for row in range(0,len(csv_df)):
+    for row in range(0,len(csv_df),1):
 
         #initial row dictionary for unmatched values 
         unmatchedTemp = {}
@@ -113,9 +116,32 @@ def matched_csv(csv_df,currTable_bols):
             #appending final array
             unmatchedcsv.append(unmatchedTemp)
 
-    return [matched_csv,unmatchedcsv]
+    matched_csv_df = pd.DataFrame(matched_csv)
+    unmatchedcsv_df = pd.DataFrame(unmatchedcsv)
 
+    return [matched_csv_df,unmatchedcsv_df]
 
+#Adding order number and order ID to table info
+def addOrder(matchedTable, matchedCSV):
+
+    mod_table = matchedTable.copy()
+
+    #looping through table rows
+    for table_row in range(0,len(matchedTable),1):
+
+        #Finding the location of table bols in csv table
+        index =  matchedCSV.index[matchedCSV['BOL'] == matchedTable.loc[table_row,'BOL']].tolist()
+
+        if len(index) == 1:
+
+            mod_table.loc[table_row, 'order_id'] = matchedCSV.loc[index[0], 'order_id']
+            mod_table.loc[table_row, 'stage'] = matchedCSV.loc[index[0], 'stage']
+
+            #TODO: Handle duplicates if length is more than 1
+    print(mod_table)
+            
+
+        
 
 ## Testing area
 xiq_df = readcsv('C:/Users/Mohammed/Documents/SandTracker_Paddle/xiq_test.csv')
@@ -125,4 +151,6 @@ normal_csv, normal_table = normalizer(xiq_df,table)
 
 matched_table_df, unmatched_table_df = matched_table(normal_table, normal_csv['BOL'].values)
 matched_csv_df, unmatched_csv_df = matched_csv(normal_csv, normal_table['BOL'].values)
+
+addOrder(matched_table_df,matched_csv_df)
 
