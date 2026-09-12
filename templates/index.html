@@ -221,6 +221,74 @@
         </div>
     </div>
 
+    <div id="xiq-import-section" class="xiq-import-section">
+        <div class="xiq-window">
+
+            <div class="xiq-header">
+                
+                <button class="tab-btn active" onclick="switchTab(event, 'orderFinder')">Order Finder</button>
+                
+            </div>
+
+            <div class="validation-content">
+                <div class="validation-ticket">
+                    <h3>Ticket</h3>
+                    <div class="ticket-preview-frame">
+                        <iframe id="validationSource" title="Ticket Preview"></iframe>
+                    </div>
+                </div>
+
+                <div class="validation-fields">
+                    <h3>Ticket Information</h3>
+
+                    <div class="ordernumber-form">
+                        <div class="validation-field">
+                            <label for="xiqSandType">Sand Type</label>
+                            <input id="validateSandType" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="xiqCarrier">Carrier</label>
+                            <input id="xiqCarrier" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="xiqeWeight">Weight</label>
+                            <input id="xiqWeight" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="xiqBol">BOL</label>
+                            <input id="xiqBol" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="xiqTruck">Truck</label>
+                            <input id="xiqTruck" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="xiqPo">PO</label>
+                            <input id="xiqPo" type="text">
+                        </div>
+
+                        <div class="validation-field">
+                            <label for="xiqFacility">Facility</label>
+                            <input id="xiqFacility" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="validation-footer">
+                <button id="previousValidation" type="button" class="button-secondary">Previous</button>
+                <button id="nextValidation" type="button">Next</button>
+            </div>
+
+        </div>
+    </div>
+
+
 </main>
 
 <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>

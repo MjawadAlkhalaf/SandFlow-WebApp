@@ -250,6 +250,7 @@ document.addEventListener("keydown", function(event) {
         }
     }
 });
+
 // ------------------------------------
 // UPLOAD BUTTON
 // ------------------------------------
@@ -291,7 +292,7 @@ ticketDropZone.addEventListener("drop", function(event) {
 
     const droppedFiles = event.dataTransfer.files;
 
-    
+
     //asigning dropped files to main variable
     files = droppedFiles;
     showSelectedFiles();

@@ -1,0 +1,14 @@
+build/
+dist/
+__pycache__/
+*.pyc
+*.pyo
+
+paddle_env/
+venv/
+.env/
+
+uploads/
+
+*.exe
+*.spec
