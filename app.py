@@ -17,6 +17,9 @@ from pydantic import BaseModel
 
 import sys
 from pathlib import Path
+import pandas as pd
+
+from matchcsv import match_xiq
 
 
 if getattr(sys, "frozen", False):
@@ -328,6 +331,20 @@ def generate_csv(data: SaveTicketsRequest):
         "tickets": existing_data,
         "csv": csv_output.getvalue()
     }
+
+#Matching entered tickets to xiq
+@app.post("/match-xiq-csv")
+async def match_xiq_export(xiq_export: UploadFile = File(...),currentTable: str = Form(...)):
+
+    xiq_file = xiq_export.file
+
+    table_data = json.loads(currentTable)
+    table_df = pd.DataFrame(table_data)
+
+    results = match_xiq(xiq_file,table_df)
+
+    return results
+
 
 if __name__ == "__main__":
 
