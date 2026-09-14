@@ -37,7 +37,7 @@ def normalizer(csv_df, currTable):
 
     
     #selecting relevant features from tubulator table
-    normal_currTable = currTable[['Sand Type','Carrier','Weight','BOL','Truck','PO','Facility',]].copy()
+    normal_currTable = currTable[['Sand Type','Carrier','Weight','BOL','Truck','PO','Facility','Source']].copy()
 
     #handling type mismatch in current table
     for i in normal_currTable.columns:
@@ -257,16 +257,36 @@ def match_xiq(csvFile, currTable):
 
     # Add xIQ match information to the original rows
     matched_full = matched_full.merge(new_table[['BOL','order_id','stage','truck_bool','po_bool','weight_bool']],on='BOL',how='left')
+    matched_json = (matched_full.astype(object).where(pd.notna(matched_full), None).to_dict(orient="records"))
+
     candidates = likeyCandidate(
         unmatched_table_df,
         unmatched_csv_df
     )
 
-   
+    #removing np.int64 text from candidate table
+    if len(candidates) > 0:
+
+        candidates_df = pd.DataFrame(candidates)
+
+        candidates_json = (candidates_df.astype(object).where(pd.notna(candidates_df), None).to_dict(orient="records"))
+
+    else:
+
+        candidates_json = []
+
+    
+
+    unmatched_json = (
+        unmatched_table_df
+        .astype(object)
+        .where(pd.notna(unmatched_table_df), None)
+        .to_dict(orient="records")
+    )
 
     return {
-        "candidates": candidates,
+        "candidates": candidates_json,
         "duplicates": duplicates,
-        "matched_with_order": matched_full.to_dict(orient="records"),
-        "unmatched_table_tickets": unmatched_table_df.to_dict(orient="records")
+        "matched_with_order": matched_json,
+        "unmatched_table_tickets": unmatched_json
     }
