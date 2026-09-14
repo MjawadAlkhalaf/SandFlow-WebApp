@@ -830,3 +830,521 @@ button:active {
 #xiq-import {
     min-width: 130px;
 }
+
+/* =========================================================
+   xIQ CSV MATCH REVIEW
+========================================================= */
+
+.match-review-modal {
+    position: fixed;
+    inset: 0;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+    box-sizing: border-box;
+
+    background: rgba(3, 10, 14, 0.78);
+    backdrop-filter: blur(4px);
+
+    overflow: hidden;
+
+    z-index: 2000;
+}
+
+
+.match-review-modal.open {
+    display: flex;
+}
+
+.match-review-window {
+    width: 96vw;
+    max-width: 1600px;
+
+    height: 94vh;
+    max-height: 94vh;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(16, 35, 40, 0.99),
+            rgba(7, 20, 29, 0.99)
+        );
+
+    border: 1px solid #31595C;
+    border-radius: 12px;
+
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.58);
+}
+
+/* Header */
+
+.match-review-header {
+    flex-shrink: 0;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+
+    padding: 10px 16px;
+
+    border-bottom: 1px solid #2A474A;
+    background: rgba(9, 27, 38, 0.96);
+}
+
+.match-review-header h2 {
+    margin: 2px 0 0;
+    color: #fff;
+    font-size: 24px;
+}
+
+.match-review-header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.match-summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.match-summary-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 6px 10px;
+
+    background: #0B1A1D;
+    border: 1px solid #2A474A;
+    border-radius: 999px;
+
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.match-summary-item strong {
+    color: #fff;
+    font-size: 13px;
+}
+
+.match-review-close {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+
+    background: transparent;
+    border: 1px solid #3e607b;
+    color: #D7E7E7;
+
+    font-size: 18px;
+}
+
+.match-review-close:hover {
+    background: #163236;
+    border-color: #4E8587;
+}
+
+
+/* Scrollable body sections */
+
+.match-review-top,
+.match-review-bottom,
+.matched-records-card {
+    flex-shrink: 0;
+}
+
+.match-review-top {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(560px, 1.05fr);
+    gap: 12px;
+
+    padding: 12px 12px 0;
+}
+
+.match-review-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+
+    padding: 12px;
+}
+
+
+/* Cards */
+
+.match-review-card {
+    min-width: 0;
+
+    padding: 12px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(16, 42, 47, 0.90),
+            rgba(9, 27, 34, 0.94)
+        );
+
+    border: 1px solid #29484C;
+    border-radius: 9px;
+
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.018);
+}
+
+.match-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    margin-bottom: 10px;
+}
+
+.match-card-heading h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 16px;
+}
+
+.match-card-kicker {
+    margin: 0 0 3px;
+
+    color: #3FC4C4;
+    font-size: 10px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: .85px;
+}
+
+.match-helper-text {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+
+/* Ticket preview */
+
+.match-record-badge,
+.candidate-score-badge {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+    padding: 5px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.match-record-badge {
+    background: #0B1A1D;
+    border: 1px solid #31575A;
+    color: var(--text-soft);
+}
+
+.candidate-score-badge {
+    background: rgba(20, 166, 166, 0.12);
+    border: 1px solid rgba(34, 183, 183, 0.42);
+    color: #75DEDE;
+}
+
+.match-ticket-preview {
+    height: 330px;
+
+    overflow: hidden;
+
+    background: #fff;
+    border: 1px solid #31575A;
+    border-radius: 7px;
+}
+
+#matchTicketPreview {
+    width: 100%;
+    height: 100%;
+
+    border: 0;
+    background: #fff;
+}
+
+
+/* Field comparison */
+
+.comparison-table {
+    overflow: hidden;
+
+    border: 1px solid #2A474A;
+    border-radius: 8px;
+}
+
+.comparison-row {
+    display: grid;
+    grid-template-columns: 0.8fr 1.25fr 1.25fr 0.7fr;
+
+    border-bottom: 1px solid #20393C;
+
+    color: var(--text-soft);
+    font-size: 12px;
+}
+
+.comparison-row:last-child {
+    border-bottom: none;
+}
+
+.comparison-row > div {
+    min-width: 0;
+
+    padding: 8px 10px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.comparison-header {
+    background: #203135;
+
+    color: #EEF7F7;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.comparison-status {
+    font-weight: 700;
+}
+
+.comparison-status.match {
+    color: #68D6A3;
+}
+
+.comparison-status.mismatch {
+    color: #F08E8E;
+}
+
+.comparison-status.neutral {
+    color: var(--muted);
+}
+
+.cell-match {
+    background: rgba(47, 182, 115, 0.07);
+    color: #79DEAE;
+}
+
+.cell-mismatch {
+    background: rgba(220, 90, 90, 0.08);
+    color: #F1A1A1;
+}
+
+
+/* xIQ Order / Stage */
+
+.xiq-match-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+
+    margin-top: 10px;
+}
+
+.xiq-match-details > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    padding: 8px 10px;
+
+    background: #0B1A1D;
+    border: 1px solid #29484C;
+    border-radius: 7px;
+}
+
+.xiq-match-details span {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+}
+
+.xiq-match-details strong {
+    color: #fff;
+    font-size: 13px;
+}
+
+.match-comparison-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 10px;
+}
+
+.match-comparison-actions button {
+    min-width: 130px;
+    height: 38px;
+}
+
+
+/* Bottom Tabulator areas */
+
+.match-table-card {
+    min-height: 285px;
+}
+
+#unmatchedSandflowTable,
+#candidateTable {
+    min-height: 225px;
+
+    overflow: hidden;
+
+    border: 1px solid #2A474A;
+    border-radius: 8px;
+    background: var(--row);
+}
+
+.matched-records-card {
+    margin: 0 12px 12px;
+}
+
+#matchedRecordsTable {
+    min-height: 180px;
+
+    overflow: hidden;
+
+    border: 1px solid #2A474A;
+    border-radius: 8px;
+    background: var(--row);
+}
+
+
+/* Make review-table rows obviously selectable */
+
+#unmatchedSandflowTable .tabulator-row,
+#candidateTable .tabulator-row {
+    cursor: pointer;
+}
+
+#unmatchedSandflowTable .tabulator-row.tabulator-selected,
+#candidateTable .tabulator-row.tabulator-selected {
+    background: rgba(20, 166, 166, 0.20) !important;
+}
+
+
+/* Footer */
+
+.match-review-footer {
+    flex-shrink: 0;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    padding: 8px 16px;
+
+    border-top: 1px solid #2A474A;
+    background: rgba(9, 27, 38, 0.96);
+}
+
+.match-review-footer button {
+    min-width: 130px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 1150px) {
+    .match-review-top,
+    .match-review-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    .match-review-window {
+        overflow-y: auto;
+    }
+
+    .match-ticket-preview {
+        height: 380px;
+    }
+}
+
+@media (max-width: 760px) {
+    .match-review-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .match-review-header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .match-summary {
+        flex-wrap: wrap;
+    }
+
+    .comparison-row {
+        grid-template-columns: 0.75fr 1fr 1fr;
+    }
+
+    .comparison-row > div:last-child {
+        display: none;
+    }
+
+    .match-comparison-actions {
+        flex-direction: column;
+    }
+
+    .match-comparison-actions button {
+        width: 100%;
+    }
+}
+
+
+
+/* =========================================================
+   Editable SandFlow values in Match Review
+========================================================= */
+
+.sandflow-edit {
+    width: 100%;
+    height: 30px;
+    padding: 0 8px;
+    background: #0B1A1D;
+    color: #EFF7F7;
+    border: 1px solid #31575A;
+    border-radius: 5px;
+    outline: none;
+}
+
+.sandflow-edit:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(20, 166, 166, 0.10);
+}
+
+.sandflow-readonly {
+    color: var(--text-soft);
+    background: rgba(255,255,255,0.02);
+}
+
+.refresh-helper {
+    margin-right: auto;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+#refreshMatch {
+    min-width: 145px;
+    height: 38px;
+}
