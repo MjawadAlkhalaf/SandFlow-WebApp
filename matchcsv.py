@@ -37,7 +37,7 @@ def normalizer(csv_df, currTable):
 
     
     #selecting relevant features from tubulator table
-    normal_currTable = currTable[['Sand Type','Carrier','Weight','BOL','Truck','PO','Facility',]]
+    normal_currTable = currTable[['Sand Type','Carrier','Weight','BOL','Truck','PO','Facility',]].copy()
 
     #handling type mismatch in current table
     for i in normal_currTable.columns:
@@ -223,24 +223,40 @@ def compare_df(matched_table, matched_csv):
 
     return matched_final
 
+def match_xiq(csvFile, currTable):
 
+    xiq_df = readcsv(csvFile)
 
+    normal_csv, normal_table = normalizer(xiq_df, currTable)
 
-## Testing area
-xiq_df = readcsv('C:/Users/Mohammed/Documents/SandTracker_Paddle/xiq_test.csv')
-table = pd.read_csv('C:/Users/Mohammed/Documents/SandTracker_Paddle/test.csv')
+    matched_table_df, unmatched_table_df = matched_table(
+        normal_table,
+        normal_csv['BOL'].values
+    )
 
-normal_csv, normal_table = normalizer(xiq_df,table)
+    matched_csv_df, unmatched_csv_df = matched_csv(
+        normal_csv,
+        normal_table['BOL'].values
+    )
 
-matched_table_df, unmatched_table_df = matched_table(normal_table, normal_csv['BOL'].values)
-matched_csv_df, unmatched_csv_df = matched_csv(normal_csv, normal_table['BOL'].values)
+    new_table, duplicates = addOrder(
+        matched_table_df,
+        matched_csv_df
+    )
 
-new_table, duplicates = addOrder(matched_table_df,matched_csv_df)
+    candidates = likeyCandidate(
+        unmatched_table_df,
+        unmatched_csv_df
+    )
 
-print(new_table)
-print(duplicates)
+    compared_table = compare_df(
+        matched_table_df,
+        matched_csv_df
+    )
 
-likeyCandidate(unmatched_table_df, unmatched_csv_df)
-
-compare_df(matched_table_df, matched_csv_df)
-
+    return {
+        "matched": compared_table.to_dict(orient="records"),
+        "candidates": candidates,
+        "duplicates": duplicates,
+        "matched_with_order": new_table.to_dict(orient="records")
+    }
