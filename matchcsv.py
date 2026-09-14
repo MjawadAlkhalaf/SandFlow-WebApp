@@ -1,4 +1,5 @@
 import pandas as pd
+from difflib import SequenceMatcher
 
 #Reading xiq export
 def readcsv(csvFile):
@@ -75,7 +76,7 @@ def matched_table(currTable, xiq_bols):
             unmatchedTable.append(unmatchedTemp)
 
     matchedTable_df = pd.DataFrame(matchedTable)
-    unmatchedTable_df = pd.DataFrame(matchedTable)
+    unmatchedTable_df = pd.DataFrame(unmatchedTable)
 
     return [matchedTable_df,unmatchedTable_df]
 
@@ -125,21 +126,76 @@ def matched_csv(csv_df,currTable_bols):
 def addOrder(matchedTable, matchedCSV):
 
     mod_table = matchedTable.copy()
+    duplicateBOLs = []
 
     #looping through table rows
     for table_row in range(0,len(matchedTable),1):
 
+
         #Finding the location of table bols in csv table
         index =  matchedCSV.index[matchedCSV['BOL'] == matchedTable.loc[table_row,'BOL']].tolist()
-
+        
         if len(index) == 1:
 
             mod_table.loc[table_row, 'order_id'] = matchedCSV.loc[index[0], 'order_id']
             mod_table.loc[table_row, 'stage'] = matchedCSV.loc[index[0], 'stage']
 
-            #TODO: Handle duplicates if length is more than 1
-    print(mod_table)
+        #having more than one index means we have a duplicate BOL
+        else:
+
+            #find duplicate bols
+            for i in index:
+                duplicateBOLs.append(matchedCSV.loc[i,'BOL'])
+
+    return(mod_table,list(set(duplicateBOLs)))
+
+#finding likely candidates of unmatched rows using gastalt pattern matching            
+def likeyCandidate(unmatchedTable, CSVTable):
+
+    #final list to be returned
+    candidates = []
+
+    #loop through unmatched values from table
+    for row in range(0,len(unmatchedTable),1):
+
+        #loop through unmatched csv table
+        for csvRow in range(0,len(CSVTable),1):
+
+            tempCandidate = {}
+
+            #finding similarity ratio
+            similarity = SequenceMatcher(None,unmatchedTable.loc[row,'BOL'],CSVTable.loc[csvRow,'BOL']).ratio()
             
+            #similarity threshold
+            if (similarity >= 0.8):
+
+                score = similarity
+
+                #weight matching adds one to the score
+                if(unmatchedTable.loc[row,'Weight'] == CSVTable.loc[csvRow,'Weight']):
+
+                    score += 1
+
+                #truck matching adds 1 to the score
+                if(unmatchedTable.loc[row,'Truck'] == CSVTable.loc[csvRow,'Truck']):
+
+                    score += 1
+
+                
+                for col in CSVTable.columns:
+
+                    tempCandidate[col] = CSVTable.loc[csvRow,col]
+
+                tempCandidate['score'] = round(score,2)
+                candidates.append(tempCandidate)
+
+        return(candidates)
+
+
+    
+
+
+
 
         
 
@@ -152,5 +208,10 @@ normal_csv, normal_table = normalizer(xiq_df,table)
 matched_table_df, unmatched_table_df = matched_table(normal_table, normal_csv['BOL'].values)
 matched_csv_df, unmatched_csv_df = matched_csv(normal_csv, normal_table['BOL'].values)
 
-addOrder(matched_table_df,matched_csv_df)
+new_table, duplicates = addOrder(matched_table_df,matched_csv_df)
+
+print(new_table)
+print(duplicates)
+
+likeyCandidate(unmatched_table_df, unmatched_csv_df)
 
