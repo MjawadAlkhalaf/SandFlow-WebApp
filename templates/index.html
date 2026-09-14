@@ -221,68 +221,234 @@
         </div>
     </div>
 
-    <div id="xiq-import-section" class="xiq-import-section">
-        <div class="xiq-window">
+    <!-- =========================================================
+         xIQ CSV MATCH REVIEW
+         Hidden until app.js opens it after matching.
+    ========================================================== -->
+    <div id="matchReviewModal" class="match-review-modal">
+        <div class="match-review-window">
 
-            <div class="xiq-header">
-                
-                <button class="tab-btn active" onclick="switchTab(event, 'orderFinder')">Order Finder</button>
-                
-            </div>
-
-            <div class="validation-content">
-                <div class="validation-ticket">
-                    <h3>Ticket</h3>
-                    <div class="ticket-preview-frame">
-                        <iframe id="validationSource" title="Ticket Preview"></iframe>
-                    </div>
+            <!-- Header -->
+            <div class="match-review-header">
+                <div>
+                    <p class="modal-kicker">xIQ Reconciliation</p>
+                    <h2>CSV Match Review</h2>
                 </div>
 
-                <div class="validation-fields">
-                    <h3>Ticket Information</h3>
+                <div class="match-review-header-right">
+                    <div class="match-summary">
+                        <span class="match-summary-item">
+                            Matched
+                            <strong id="matchedCount">0</strong>
+                        </span>
 
-                    <div class="ordernumber-form">
-                        <div class="validation-field">
-                            <label for="xiqSandType">Sand Type</label>
-                            <input id="validateSandType" type="text">
-                        </div>
+                        <span class="match-summary-item">
+                            Unmatched
+                            <strong id="unmatchedCount">0</strong>
+                        </span>
 
-                        <div class="validation-field">
-                            <label for="xiqCarrier">Carrier</label>
-                            <input id="xiqCarrier" type="text">
-                        </div>
-
-                        <div class="validation-field">
-                            <label for="xiqeWeight">Weight</label>
-                            <input id="xiqWeight" type="text">
-                        </div>
-
-                        <div class="validation-field">
-                            <label for="xiqBol">BOL</label>
-                            <input id="xiqBol" type="text">
-                        </div>
-
-                        <div class="validation-field">
-                            <label for="xiqTruck">Truck</label>
-                            <input id="xiqTruck" type="text">
-                        </div>
-
-                        <div class="validation-field">
-                            <label for="xiqPo">PO</label>
-                            <input id="xiqPo" type="text">
-                        </div>
-
-                        <div class="validation-field">
-                            <label for="xiqFacility">Facility</label>
-                            <input id="xiqFacility" type="text">
-                        </div>
+                        <span class="match-summary-item">
+                            Duplicates
+                            <strong id="duplicateCount">0</strong>
+                        </span>
                     </div>
+
+                    <button
+                        id="closeMatchReview"
+                        type="button"
+                        class="match-review-close"
+                        aria-label="Close CSV Match Review"
+                    >
+                        ✕
+                    </button>
                 </div>
             </div>
 
-            <div class="validation-footer">
-                <button id="previousValidation" type="button" class="button-secondary">Previous</button>
-                <button id="nextValidation" type="button">Next</button>
+
+            <!-- Top section: ticket preview + field comparison -->
+            <div class="match-review-top">
+
+                <section class="match-review-card match-ticket-card">
+                    <div class="match-card-heading">
+                        <div>
+                            <p class="match-card-kicker">Source Ticket</p>
+                            <h3>SandFlow Ticket</h3>
+                        </div>
+
+                        <span id="selectedSourceBol" class="match-record-badge">
+                            No ticket selected
+                        </span>
+                    </div>
+
+                    <div class="match-ticket-preview">
+                        <iframe
+                            id="matchTicketPreview"
+                            title="Selected SandFlow Ticket"
+                        ></iframe>
+                    </div>
+                </section>
+
+
+                <section class="match-review-card match-comparison-card">
+
+                    <div class="match-card-heading">
+                        <div>
+                            <p class="match-card-kicker">Selected Candidate</p>
+                            <h3>SandFlow vs xIQ</h3>
+                        </div>
+
+                        <span id="selectedCandidateScore" class="candidate-score-badge">
+                            Score —
+                        </span>
+                    </div>
+
+
+                    <div class="comparison-table">
+
+                        <div class="comparison-row comparison-header">
+                            <div>Field</div>
+                            <div>SandFlow</div>
+                            <div>xIQ</div>
+                            <div>Status</div>
+                        </div>
+
+                        <div id="comparisonRows">
+
+                            <div class="comparison-row" data-field="BOL">
+                                <div>BOL</div>
+                                <div><input id="editSandflowBol" class="sandflow-edit" type="text" value=""></div>
+                                <div class="xiq-value">—</div>
+                                <div class="comparison-status neutral">—</div>
+                            </div>
+
+                            <div class="comparison-row" data-field="Weight">
+                                <div>Weight</div>
+                                <div><input id="editSandflowWeight" class="sandflow-edit" type="text" value=""></div>
+                                <div class="xiq-value">—</div>
+                                <div class="comparison-status neutral">—</div>
+                            </div>
+
+                            <div class="comparison-row" data-field="Truck">
+                                <div>Truck</div>
+                                <div><input id="editSandflowTruck" class="sandflow-edit" type="text" value=""></div>
+                                <div class="xiq-value">—</div>
+                                <div class="comparison-status neutral">—</div>
+                            </div>
+
+                            <div class="comparison-row" data-field="PO">
+                                <div>PO</div>
+                                <div><input id="editSandflowPo" class="sandflow-edit" type="text" value=""></div>
+                                <div class="xiq-value">—</div>
+                                <div class="comparison-status neutral">—</div>
+                            </div>
+
+                            <div class="comparison-row" data-field="Carrier">
+                                <div>Carrier</div>
+                                <div><input id="editSandflowCarrier" class="sandflow-edit" type="text" value=""></div>
+                                <div class="xiq-value">—</div>
+                                <div class="comparison-status neutral">—</div>
+                            </div>
+
+                            <div class="comparison-row" data-field="Sand Type">
+                                <div>Sand Type</div>
+                                <div id="sandflowSandTypeDisplay" class="sandflow-readonly">—</div>
+                                <div class="xiq-value">—</div>
+                                <div class="comparison-status neutral">Not used</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="xiq-match-details">
+                        <div>
+                            <span>Order ID</span>
+                            <strong id="selectedOrderId">—</strong>
+                        </div>
+
+                        <div>
+                            <span>Stage</span>
+                            <strong id="selectedStage">—</strong>
+                        </div>
+                    </div>
+
+
+                    <div class="match-comparison-actions">
+                        <span class="refresh-helper">Edit SandFlow values above, then retry the match.</span>
+                        <button id="refreshMatch" type="button">Refresh Match</button>
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- Bottom section: row-click workflow -->
+            <div class="match-review-bottom">
+
+                <section class="match-review-card match-table-card">
+                    <div class="match-card-heading">
+                        <div>
+                            <p class="match-card-kicker">Requires Review</p>
+                            <h3>Unmatched SandFlow Tickets</h3>
+                        </div>
+
+                        <span class="match-helper-text">
+                            Click a row to show its candidates.
+                        </span>
+                    </div>
+
+                    <div id="unmatchedSandflowTable"></div>
+                </section>
+
+
+                <section class="match-review-card match-table-card">
+                    <div class="match-card-heading">
+                        <div>
+                            <p class="match-card-kicker">Likely Matches</p>
+                            <h3>
+                                Candidates for
+                                <span id="candidateSourceBol">—</span>
+                            </h3>
+                        </div>
+
+                        <span class="match-helper-text">
+                            Ranked by score after row selection.
+                        </span>
+                    </div>
+
+                    <div id="candidateTable"></div>
+                </section>
+
+            </div>
+
+
+            <!-- Confirmed matches -->
+            <section class="match-review-card matched-records-card">
+                <div class="match-card-heading">
+                    <div>
+                        <p class="match-card-kicker">Confirmed</p>
+                        <h3>Matched Records</h3>
+                    </div>
+
+                    <span class="match-helper-text">
+                        Automatic exact matches and corrected tickets.
+                    </span>
+                </div>
+
+                <div id="matchedRecordsTable"></div>
+            </section>
+
+
+            <div class="match-review-footer">
+                <button
+                    id="closeMatchReviewBottom"
+                    type="button"
+                    class="button-secondary"
+                >
+                    Close
+                </button>
+
             </div>
 
         </div>
