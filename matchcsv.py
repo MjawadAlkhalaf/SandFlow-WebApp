@@ -252,7 +252,11 @@ def match_xiq(csvFile, currTable):
         compared_table,
         matched_csv_df
     )
+    # Get the original full SandFlow rows for matched BOLs
+    matched_full = currTable[ currTable['BOL'].astype(str).isin(new_table['BOL'].astype(str))].copy()
 
+    # Add xIQ match information to the original rows
+    matched_full = matched_full.merge(new_table[['BOL','order_id','stage','truck_bool','po_bool','weight_bool']],on='BOL',how='left')
     candidates = likeyCandidate(
         unmatched_table_df,
         unmatched_csv_df
@@ -263,6 +267,6 @@ def match_xiq(csvFile, currTable):
     return {
         "candidates": candidates,
         "duplicates": duplicates,
-        "matched_with_order": new_table.to_dict(orient="records"),
+        "matched_with_order": matched_full.to_dict(orient="records"),
         "unmatched_table_tickets": unmatched_table_df.to_dict(orient="records")
     }
