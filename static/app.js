@@ -783,3 +783,181 @@ function closeValidation() {
 }
 
 
+
+// load imported xiq file
+const csvInput = document.getElementById("csvFile");
+
+document.getElementById("xiq-import").addEventListener("click", async function () {
+
+    // Make sure CSV is selected
+    if (csvInput.files.length === 0) {
+        alert("Please upload XIQ CSV");
+        return;
+    }
+
+    // Send CSV and current Tabulator data to fastapi
+    const formData = new FormData();
+
+    // appending uploaded csv
+    formData.append("xiq_export", csvInput.files[0]);
+
+    const tableData = table.getData();
+
+    // reformatting headers to match backend headers
+    const formattedTable = tableData.map(row => ({
+        "Silo": row.silo,
+        "Sand Type": row.sandType,
+        "Carrier": row.carrier,
+        "Weight": row.weight,
+        "BOL": row.bol,
+        "Truck": row.truck,
+        "PO": row.po,
+        "Date": row.date,
+        "Time": row.time,
+        "Facility": row.facility,
+        "Source": row.source
+    }));
+
+    // reformatting current table to json format
+    const table_json = JSON.stringify(formattedTable);
+
+    // sending current table to fastapi
+    formData.append("currentTable", table_json);
+
+    // sending info to match-xiq-csv function in app.py
+    const response = await fetch("/match-xiq-csv", {method: "POST", body: formData});
+
+    //collecting response
+    const result = await response.json();
+
+    console.log(result);
+
+    //  Open Match Review 
+    document.getElementById("matchReviewModal").classList.add("open");
+
+    // creating matched record table in the pop-up
+    const matchedRecordsTable = new Tabulator("#matchedRecordsTable", {
+
+        data: result.matched_with_order,
+
+        layout: "fitColumns",
+        height: "250px",
+        
+        selectableRange: true,
+    
+
+        clipboard: true,
+        clipboardCopyRowRange: "range",
+
+        clipboardCopyConfig: {
+            rowHeaders: false,
+            columnHeaders: false,
+            columnGroups: false
+        },
+
+        columns: [
+            { title: "Silo", field: "Silo" },
+            { title: "Sand Type", field: "Sand Type" },
+            { title: "Carrier", field: "Carrier" },
+            { title: "Weight", field: "Weight" },
+            { title: "BOL", field: "BOL" },
+            { title: "Truck", field: "Truck" },
+            { title: "PO", field: "PO" },
+            { title: "Date", field: "Date" },
+            { title: "Time", field: "Time" },
+            { title: "Facility", field: "Facility" },
+            { title: "Order ID", field: "order_id" },
+            { title: "Stage", field: "stage" }
+        ]
+    });
+
+    // creating unmatched table records in pop up
+    const unmatchedRecordsTable = new Tabulator("#unmatchedSandflowTable", {
+
+        data: result.unmatched_table_tickets,
+
+        layout: "fitColumns",
+        height: "250px",
+        
+        selectableRange: true,
+    
+
+        clipboard: true,
+        clipboardCopyRowRange: "range",
+
+        clipboardCopyConfig: {
+            rowHeaders: false,
+            columnHeaders: false,
+            columnGroups: false
+        },
+
+        columns: [
+            { title: "Sand Type", field: "Sand Type" },
+            { title: "Carrier", field: "Carrier" },
+            { title: "Weight", field: "Weight" },
+            { title: "BOL", field: "BOL" },
+            { title: "Truck", field: "Truck" },
+            { title: "PO", field: "PO" },
+            
+        ]
+    });
+
+    // creating initial candiate tabulator table for likely candidates
+    const candidateTable = new Tabulator("#candidateTable", {
+    layout: "fitColumns",
+    height: "220px",
+
+    selectableRange: true,
+        
+
+    clipboard: true,
+    clipboardCopyRowRange: "range",
+
+    clipboardCopyConfig: {
+        rowHeaders: false,
+        columnHeaders: false,
+        columnGroups: false
+    },
+
+    columns: [
+        { title: "BOL", field: "BOL" },
+        { title: "Weight", field: "Weight" },
+        { title: "Truck", field: "Truck" },
+        { title: "PO", field: "PO" },
+        { title: "Carrier", field: "Carrier" },
+        { title: "Order ID", field: "order_id" },
+        { title: "Stage", field: "stage" },
+        { title: "Score", field: "score" }
+    ]
+    });
+
+    // connecting row click to unmatched table and displaying candidate table
+    unmatchedRecordsTable.on("rowClick", function (e, row) {
+
+        // getting row data click
+        const selectedRow = row.getData();
+
+        // populating table label
+        document.getElementById("candidateSourceBol").textContent = selectedRow.BOL;
+
+        // displaying ticket picture for the row clicked
+        document.getElementById("matchTicketPreview").src = selectedRow.Source;
+
+        //debug
+        console.log("CLICKED ROW:");
+        console.log(selectedRow);
+
+        console.log("ALL CANDIDATES:");
+        console.log(result.candidates);
+
+        //filtering candidate table by bol value clicked and sorting by score
+        const selectedCandidates = result.candidates.filter(candidate => candidate.source_bol === selectedRow.BOL).sort((a, b) => b.score - a.score);
+
+        console.log("FILTERED CANDIDATES:");
+        console.log(selectedCandidates);
+        
+        // populating table
+        candidateTable.setData(selectedCandidates);
+    });
+    
+});
