@@ -198,7 +198,7 @@ def likeyCandidate(unmatchedTable, CSVTable):
 
                 #keeping original bol being matched to sort in app.js
                 tempCandidate['source_bol'] = unmatchedTable.loc[row, 'BOL']
-                
+
                 tempCandidate['score'] = round(score,2)
                 candidates.append(tempCandidate)
 
@@ -243,8 +243,13 @@ def match_xiq(csvFile, currTable):
         normal_table['BOL'].values
     )
 
+    compared_table = compare_df(
+            matched_table_df,
+            matched_csv_df
+        )
+
     new_table, duplicates = addOrder(
-        matched_table_df,
+        compared_table,
         matched_csv_df
     )
 
@@ -253,13 +258,11 @@ def match_xiq(csvFile, currTable):
         unmatched_csv_df
     )
 
-    compared_table = compare_df(
-        matched_table_df,
-        matched_csv_df
-    )
+   
 
     return {
         "candidates": candidates,
         "duplicates": duplicates,
-        "matched_with_order": new_table.to_dict(orient="records")
+        "matched_with_order": new_table.to_dict(orient="records"),
+        "unmatched_table_tickets": unmatched_table_df.to_dict(orient="records")
     }
