@@ -16,10 +16,8 @@ def normalizer(csv_df, currTable):
 
     #removing white space from xiq columns
     for col in normalized_df.columns:
-        if (col not in ['driver_weight','order_id','stage']):
-            normalized_df[col] = csv_df[col].astype(str).str.strip().astype(str)
-        else:
-            normalized_df[col] = csv_df[col].astype(str).str.strip().astype(float)
+        
+        normalized_df[col] = (csv_df[col].astype(str).str.strip().str.replace(r'\.0$', '', regex=True))
 
     #establishing the same columns names as Tubulator Table
     normal_csv = normalized_df.rename(columns={
@@ -32,8 +30,20 @@ def normalizer(csv_df, currTable):
             'truck' : 'Truck'
             })
 
+    #handling numeric values in xiq export csv
+    normal_csv['Weight'] = pd.to_numeric(normal_csv['Weight'], errors='coerce').astype('Int64')
+    normal_csv['order_id'] = pd.to_numeric(normal_csv['order_id'], errors='coerce').astype('Int64')
+    normal_csv['stage'] = pd.to_numeric(normal_csv['stage'], errors='coerce').astype('Int64')
+
+    
     #selecting relevant features from tubulator table
     normal_currTable = currTable[['Sand Type','Carrier','Weight','BOL','Truck','PO','Facility',]]
+
+    #handling type mismatch in current table
+    for i in normal_currTable.columns:
+
+        if i != 'Weight':
+            normal_currTable[i] = normal_currTable[i].astype(str)
 
 
     return [normal_csv,normal_currTable]
@@ -189,15 +199,32 @@ def likeyCandidate(unmatchedTable, CSVTable):
                 tempCandidate['score'] = round(score,2)
                 candidates.append(tempCandidate)
 
-        return(candidates)
+    return(candidates)
 
+def compare_df(matched_table, matched_csv):
 
     
 
+    #Final matched table to modify
+    matched_final = matched_table.copy()
 
-
-
+    #looping through both tables to compate
+    for row in range(0,len(matched_table),1):
         
+        for csv_row in range(0,len(matched_csv),1):
+
+            #find the matched row
+            if(matched_table.loc[row,'BOL'] == matched_csv.loc[csv_row,'BOL']):
+                  
+                #flag difference values for truck, po, weight
+                matched_final.loc[row,'truck_bool'] = (matched_table.loc[row,'Truck'] == matched_csv.loc[csv_row,'Truck'])
+                matched_final.loc[row,'po_bool'] = (matched_table.loc[row,'PO'] == matched_csv.loc[csv_row,'PO'])
+                matched_final.loc[row,'weight_bool'] = (matched_table.loc[row,'Weight'] == matched_csv.loc[csv_row,'Weight'])
+
+    return matched_final
+
+
+
 
 ## Testing area
 xiq_df = readcsv('C:/Users/Mohammed/Documents/SandTracker_Paddle/xiq_test.csv')
@@ -214,4 +241,6 @@ print(new_table)
 print(duplicates)
 
 likeyCandidate(unmatched_table_df, unmatched_csv_df)
+
+compare_df(matched_table_df, matched_csv_df)
 
