@@ -136,7 +136,7 @@ def matched_csv(csv_df,currTable_bols):
 def addOrder(matchedTable, matchedCSV):
 
     mod_table = matchedTable.copy()
-    duplicateBOLs = []
+    duplicates = []
 
     #looping through table rows
     for table_row in range(0,len(matchedTable),1):
@@ -155,9 +155,13 @@ def addOrder(matchedTable, matchedCSV):
 
             #find duplicate bols
             for i in index:
-                duplicateBOLs.append(matchedCSV.loc[i,'BOL'])
+                duplicates.append({
+                "BOL": matchedCSV.loc[i, "BOL"],
+                "order_id": int(matchedCSV.loc[i, "order_id"]),
+                "stage": int(matchedCSV.loc[i, "stage"])
+            })
 
-    return(mod_table,list(set(duplicateBOLs)))
+    return(mod_table,duplicates)
 
 #finding likely candidates of unmatched rows using gastalt pattern matching            
 def likeyCandidate(unmatchedTable, CSVTable):
@@ -275,18 +279,16 @@ def match_xiq(csvFile, currTable):
 
         candidates_json = []
 
+    matched_csv_json = (matched_csv_df.astype(object).where(pd.notna(matched_csv_df), None).to_dict(orient="records"))
+    
     
 
-    unmatched_json = (
-        unmatched_table_df
-        .astype(object)
-        .where(pd.notna(unmatched_table_df), None)
-        .to_dict(orient="records")
-    )
+    unmatched_json = (unmatched_table_df.astype(object).where(pd.notna(unmatched_table_df), None).to_dict(orient="records"))
 
     return {
         "candidates": candidates_json,
         "duplicates": duplicates,
         "matched_with_order": matched_json,
+        "matched_csv": matched_csv_json,
         "unmatched_table_tickets": unmatched_json
     }
