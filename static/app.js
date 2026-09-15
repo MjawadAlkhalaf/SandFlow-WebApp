@@ -788,7 +788,7 @@ function closeValidation() {
 const csvInput = document.getElementById("csvFile");
 
 document.getElementById("xiq-import").addEventListener("click", async function () {
-
+    
     // Make sure CSV is selected
     if (csvInput.files.length === 0) {
         alert("Please upload XIQ CSV");
@@ -902,6 +902,10 @@ document.getElementById("xiq-import").addEventListener("click", async function (
         ]
     });
 
+    // unmatched count
+    document.getElementById("unmatchedCount").textContent = result.unmatched_table_tickets.length;
+
+
     // creating initial candiate tabulator table for likely candidates
     const candidateTable = new Tabulator("#candidateTable", {
     layout: "fitColumns",
@@ -931,33 +935,172 @@ document.getElementById("xiq-import").addEventListener("click", async function (
     ]
     });
 
+    
+
     // connecting row click to unmatched table and displaying candidate table
-    unmatchedRecordsTable.on("rowClick", function (e, row) {
+    unmatchedRecordsTable.on("rowClick", function (e,row) {
 
-        // getting row data click
-        const selectedRow = row.getData();
+        
+        document.getElementById("selectedOrderId").textContent = "-";
 
+        document.getElementById("selectedStage").textContent = "-";
+
+        // Save previously selected MATCHED row
+        if (selectedRow !== null) {
+            updateTableXIQ(selectedRow);
+        }
+
+        // Now switch selection to unmatched row
+        selectedRow = row.getData();
+        
         // populating table label
         document.getElementById("candidateSourceBol").textContent = selectedRow.BOL;
 
         // displaying ticket picture for the row clicked
         document.getElementById("matchTicketPreview").src = selectedRow.Source;
 
-        //debug
-        console.log("CLICKED ROW:");
-        console.log(selectedRow);
+        // setting the fields to ticket info
 
-        console.log("ALL CANDIDATES:");
-        console.log(result.candidates);
+        document.getElementById("editSandflowBol").value = selectedRow.BOL;
+        
+        document.getElementById("editSandflowWeight").value = selectedRow.Weight;
+        document.getElementById("editSandflowTruck").value = selectedRow.Truck;
+        document.getElementById("editSandflowPo").value = selectedRow.PO;
+        document.getElementById("editSandflowCarrier").value = selectedRow.Carrier;
+        document.getElementById("sandflowSandTypeDisplay").textContent = selectedRow["Sand Type"] ;
+
+        
+        
+
+        // populating ticket label
+        document.getElementById("selectedSourceBol").textContent = selectedRow.BOL;
+        
 
         //filtering candidate table by bol value clicked and sorting by score
         const selectedCandidates = result.candidates.filter(candidate => candidate.source_bol === selectedRow.BOL).sort((a, b) => b.score - a.score);
 
-        console.log("FILTERED CANDIDATES:");
-        console.log(selectedCandidates);
         
         // populating table
         candidateTable.setData(selectedCandidates);
     });
+
+    document.getElementById("matchedCount").textContent = result.matched_with_order.length;
+    let selectedRow = null;
+    matchedRecordsTable.on("rowClick", function (e,row) {
+        
+        if (selectedRow !== null) {
+            updateTableXIQ(selectedRow);
+        }
+
+        candidateTable.clearData();
+
+        selectedRow = row.getData();
+
+        // displaying ticket picture for the row clicked
+        document.getElementById("matchTicketPreview").src = selectedRow.Source;
+
+        // setting the fields to ticket info
+        document.getElementById("editSandflowBol").value = selectedRow.BOL;
+        
+        document.getElementById("editSandflowWeight").value = selectedRow.Weight;
+        document.getElementById("editSandflowTruck").value = selectedRow.Truck;
+        document.getElementById("editSandflowPo").value = selectedRow.PO;
+        document.getElementById("editSandflowCarrier").value = selectedRow.Carrier;
+        document.getElementById("sandflowSandTypeDisplay").textContent = selectedRow["Sand Type"] ;
+        
+         
+        // populating ticket label
+        document.getElementById("selectedSourceBol").textContent = selectedRow.BOL;
+
+        const fields = ["BOL","Weight","Truck","PO","Carrier","Sand Type"];
+
+        const matchedXiqRow = result.matched_csv.find(xiqRow => xiqRow.BOL === selectedRow.BOL);
+
+        if (matchedXiqRow) {
+
+            for (const field of fields) {
+
+                const comparisonRow = document.querySelector(`.comparison-row[data-field="${field}"]`);
+                comparisonRow.querySelector(".xiq-value").textContent = matchedXiqRow[field];
+
+                const status = comparisonRow.querySelector(".comparison-status");
+
+                if (field === "Sand Type") {
+                    status.textContent = "Not used";
+                }
+                else if (field === "Weight") {
+                    status.textContent = selectedRow.weight_bool ? "Verified" : "Mismatch";
+                }
+                else if (field === "Truck") {
+                    status.textContent = selectedRow.truck_bool ? "Verified" : "Mismatch";
+                }
+                else if (field === "PO") {
+                    status.textContent = selectedRow.po_bool ? "Verified" : "Mismatch"
+                }
+                else if (field === "BOL") {
+
+                    if (result.duplicates.some(duplicate => duplicate.BOL === selectedRow.BOL)) {
+
+                        status.textContent = "Duplicate";
+
+                        const dupes = [];
+
+                        for (const duplicate of result.duplicates) {
+
+                            if (duplicate.BOL === selectedRow.BOL) {
+
+                                dupes.push(duplicate.order_id);
+
+                            }
+                        }
+
+                        alert("Bol: " + selectedRow.BOL + " Found in Orders:\n" + dupes.join("\n"));
+                    }
+                    else {
+                        status.textContent = "Verified";
+                    }
+                }
+                else {
+                    status.textContent = "Verified";
+                }
+
+            }
+            // Populate Order ID and Stage separately
+            document.getElementById("selectedOrderId").textContent = matchedXiqRow.order_id;
+
+            document.getElementById("selectedStage").textContent = matchedXiqRow.stage;
+        
+        }
+            
+        
+        
+
+
+    })
+    function updateTableXIQ(selectedRow){
+
+    const matchedRow = result.matched_with_order.find(row => row.BOL === selectedRow.BOL);
+
+        if (!matchedRow) {
+            return;
+        }
+
+
     
+        matchedRow.Carrier = document.getElementById("editSandflowCarrier").value;
+        matchedRow.Weight = document.getElementById("editSandflowWeight").value;
+        matchedRow.BOL = document.getElementById("editSandflowBol").value;
+        matchedRow.Truck = document.getElementById("editSandflowTruck").value;
+        matchedRow.PO = document.getElementById("editSandflowPo").value;
+
+    
+    }
 });
+
+
+
+//const refreshButton = document.getElementById("refreshMatch");
+
+//refreshButton.addEventListener("click", refresh);
+
+
