@@ -1126,11 +1126,18 @@ button:active {
 }
 
 .comparison-status.match {
-    color: #68D6A3;
+    color: #56E39F;
+    background: rgba(47, 182, 115, 0.12);
 }
 
 .comparison-status.mismatch {
-    color: #F08E8E;
+    color: #FF7B7B;
+    background: rgba(220, 90, 90, 0.14);
+}
+
+.comparison-status.duplicate {
+    color: #F4C95D;
+    background: rgba(244, 201, 93, 0.12);
 }
 
 .comparison-status.neutral {
@@ -1347,4 +1354,20 @@ button:active {
 #refreshMatch {
     min-width: 145px;
     height: 38px;
+}
+
+
+/* Use xIQ Values action */
+.use-xiq-values {
+    min-width: 145px;
+    height: 38px;
+    background: linear-gradient(180deg, #2FB673, #218A56);
+    border: 1px solid #42C986;
+    color: #ffffff;
+}
+
+.use-xiq-values:hover {
+    background: linear-gradient(180deg, #3BC982, #279B62);
+    border-color: #5DDA99;
+    box-shadow: 0 7px 16px rgba(47, 182, 115, 0.22);
 }
