@@ -782,6 +782,60 @@ function closeValidation() {
     document.getElementById("validationSource").src = "";
 }
 
+//////////// CSV Ticket matching
+
+const csvDropZone = document.getElementById("csvDropZone");
+const csvInput = document.getElementById("csvFile");
+
+let csv = null;
+
+
+// File selected using Browse CSV
+csvInput.addEventListener("change", function() {
+
+    csv = csvInput.files[0];
+
+    showCSVFile();
+});
+
+
+// Drag over
+csvDropZone.addEventListener("dragover", function(event) {
+
+    event.preventDefault();
+
+    csvDropZone.classList.add("drag-over");
+});
+
+
+// Drag leave
+csvDropZone.addEventListener("dragleave", function() {
+
+    csvDropZone.classList.remove("drag-over");
+});
+
+
+// Drop CSV
+csvDropZone.addEventListener("drop", function(event) {
+
+    event.preventDefault();
+
+    csvDropZone.classList.remove("drag-over");
+
+    const droppedCSV = event.dataTransfer.files[0];
+
+    csv = droppedCSV;
+
+    showCSVFile();
+});
+
+
+// Show file name
+function showCSVFile() {
+
+    document.getElementById("csvFileName").textContent = csv.name;
+}
+
 
 let matchedRecordsTable = null;
 let unmatchedRecordsTable = null;
@@ -790,25 +844,23 @@ let row_index = null;
 let result = null;
 
 
-// load imported xiq file
-const csvInput = document.getElementById("csvFile");
-
 document.getElementById("xiq-import").addEventListener("click", match_xiq)
 
 async function match_xiq() {
     
     // Make sure CSV is selected
-    if (csvInput.files.length === 0) {
+    if (csv === null) {
         alert("Please upload XIQ CSV");
         return;
     }
+    
 
 
     // Send CSV and current Tabulator data to fastapi
     const formData = new FormData();
 
     // appending uploaded csv
-    formData.append("xiq_export", csvInput.files[0]);
+    formData.append("xiq_export", csv);
 
     const tableData = table.getData();
 
@@ -953,6 +1005,19 @@ async function match_xiq() {
 
         document.getElementById("selectedStage").textContent = "-";
 
+        const fields = ["BOL","Weight","Truck","PO","Carrier","Sand Type"];
+
+        // resetting xiq fields to null when switching to unmatched table
+        for (const field of fields) {
+
+            const comparisonRow = document.querySelector(`.comparison-row[data-field="${field}"]`);
+            
+            comparisonRow.querySelector(".xiq-value").textContent = "-";
+
+            comparisonRow.querySelector(".comparison-status").textContent = "-";
+            
+        }
+
         // Save previously selected row
         if (row_index !== null) {
             updateTableXIQ(row_index);
@@ -1047,13 +1112,34 @@ async function match_xiq() {
                     status.textContent = "-";
                 }
                 else if (field === "Weight") {
-                    status.textContent = selectedRow.weight_bool ? "Verified" : "Mismatch";
+
+                    status.textContent = selectedRow.weight_bool ? "Match" : "Mismatch";
+
+                    // removing existing style
+                    status.classList.remove("match", "mismatch","neutral");
+
+                    // adding styling to match and mismatch
+                    status.classList.add(selectedRow.weight_bool ? "match" : "mismatch");
+
                 }
                 else if (field === "Truck") {
-                    status.textContent = selectedRow.truck_bool ? "Verified" : "Mismatch";
+
+                    status.textContent = selectedRow.truck_bool ? "Match" : "Mismatch";
+
+                    // removing existing style
+                    status.classList.remove("match", "mismatch","neutral");
+
+                    // adding styling to match and mismatch
+                    status.classList.add(selectedRow.truck_bool ? "match" : "mismatch");
                 }
                 else if (field === "PO") {
-                    status.textContent = selectedRow.po_bool ? "Verified" : "Mismatch"
+                    status.textContent = selectedRow.po_bool ? "Match" : "Mismatch"
+
+                     // removing existing style
+                    status.classList.remove("match", "mismatch","neutral");
+
+                    // adding styling to match and mismatch
+                    status.classList.add(selectedRow.po_bool ? "match" : "mismatch");
                 }
                 else if (field === "BOL") {
 
@@ -1061,6 +1147,12 @@ async function match_xiq() {
                     if (result.duplicates.some(duplicate => duplicate.BOL === selectedRow.BOL)) {
 
                         status.textContent = "Duplicate";
+
+                        // removing existing style
+                        status.classList.remove("match", "mismatch","neutral");
+
+                        // adding styling to match and mismatch
+                        status.classList.add("mismatch");
 
                         const dupes = [];
 
@@ -1077,11 +1169,23 @@ async function match_xiq() {
                         alert("Bol: " + selectedRow.BOL + " Found in Orders:\n" + dupes.join("\n"));
                     }
                     else {
-                        status.textContent = "Verified";
+                        status.textContent = "Match";
+
+                        // removing existing style
+                        status.classList.remove("match", "mismatch","neutral");
+
+                        // adding styling to match and mismatch
+                        status.classList.add("match");
                     }
                 }
                 else {
-                    status.textContent = "Verified";
+                    status.textContent = "Match";
+
+                     // removing existing style
+                    status.classList.remove("match", "mismatch","neutral");
+
+                    // adding styling to match and mismatch
+                    status.classList.add("match");
                 }
 
             }
@@ -1168,6 +1272,9 @@ async function refresh() {
 // close xiq window pop up
 const closeButtonTop = document.getElementById("closeMatchReview");
 closeButtonTop.addEventListener("click", closeXIQ);
+
+const closeButtonBottom = document.getElementById("closeMatchReviewBottom")
+closeButtonBottom.addEventListener("click", closeXIQ)
 
 function closeXIQ () {
 
