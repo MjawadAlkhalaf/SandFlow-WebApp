@@ -43,7 +43,7 @@ def normalizer(csv_df, currTable):
     for i in normal_currTable.columns:
 
         if i != 'Weight':
-            normal_currTable[i] = normal_currTable[i].astype(str)
+            normal_currTable[i] = normal_currTable[i].astype(str).str.strip().str.replace(r'\.0$', '', regex=True)
 
 
     return [normal_csv,normal_currTable]
@@ -227,11 +227,11 @@ def compare_df(matched_table, matched_csv):
 
             #find the matched row
             if(matched_table.loc[row,'BOL'] == matched_csv.loc[csv_row,'BOL']):
-                  
+                
                 #flag difference values for truck, po, weight
-                matched_final.loc[row,'truck_bool'] = (matched_table.loc[row,'Truck'] == matched_csv.loc[csv_row,'Truck'])
-                matched_final.loc[row,'po_bool'] = (matched_table.loc[row,'PO'] == matched_csv.loc[csv_row,'PO'])
-                matched_final.loc[row,'weight_bool'] = (matched_table.loc[row,'Weight'] == matched_csv.loc[csv_row,'Weight'])
+                matched_final.loc[row,'truck_bool'] = (str(matched_table.loc[row,'Truck']) == str(matched_csv.loc[csv_row,'Truck']))
+                matched_final.loc[row,'po_bool'] = (str(matched_table.loc[row,'PO']) == str(matched_csv.loc[csv_row,'PO']))
+                matched_final.loc[row,'weight_bool'] = (str(matched_table.loc[row,'Weight']) == str(matched_csv.loc[csv_row,'Weight']))
 
     return matched_final
 
@@ -272,6 +272,8 @@ def match_xiq(csvFile, currTable):
         # Add xIQ match information to the original rows
         matched_full = matched_full.merge(new_table[['BOL','order_id','stage','truck_bool','po_bool','weight_bool']],on='BOL',how='left')
         matched_json = (matched_full.astype(object).where(pd.notna(matched_full), None).to_dict(orient="records"))
+
+
         
     #fallback in case no order id matches were found
     else:
