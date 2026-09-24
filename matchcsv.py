@@ -138,6 +138,10 @@ def addOrder(matchedTable, matchedCSV):
     mod_table = matchedTable.copy()
     duplicates = []
 
+    #initializing new columns
+    mod_table['order_id'] = pd.NA
+    mod_table['stage'] = pd.NA
+
     #looping through table rows
     for table_row in range(0,len(matchedTable),1):
 
@@ -256,12 +260,25 @@ def match_xiq(csvFile, currTable):
         compared_table,
         matched_csv_df
     )
-    # Get the original full SandFlow rows for matched BOLs
-    matched_full = currTable[ currTable['BOL'].astype(str).isin(new_table['BOL'].astype(str))].copy()
+    
+    
 
-    # Add xIQ match information to the original rows
-    matched_full = matched_full.merge(new_table[['BOL','order_id','stage','truck_bool','po_bool','weight_bool']],on='BOL',how='left')
-    matched_json = (matched_full.astype(object).where(pd.notna(matched_full), None).to_dict(orient="records"))
+    #checking if matches are found
+    if not new_table.empty:
+
+        # Get the original full SandFlow rows for matched BOLs
+        matched_full = currTable[ currTable['BOL'].astype(str).isin(new_table['BOL'].astype(str))].copy()
+        
+        # Add xIQ match information to the original rows
+        matched_full = matched_full.merge(new_table[['BOL','order_id','stage','truck_bool','po_bool','weight_bool']],on='BOL',how='left')
+        matched_json = (matched_full.astype(object).where(pd.notna(matched_full), None).to_dict(orient="records"))
+        
+    #fallback in case no order id matches were found
+    else:
+        matched_full = None
+        matched_json = None
+
+    
 
     candidates = likeyCandidate(
         unmatched_table_df,
