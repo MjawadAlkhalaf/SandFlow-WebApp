@@ -1062,7 +1062,7 @@ button:active {
 }
 
 .match-ticket-preview {
-    height: 330px;
+    height: 415px;
 
     overflow: hidden;
 
@@ -1222,7 +1222,7 @@ button:active {
 }
 
 .matched-records-card {
-    margin: 0 12px 12px;
+    margin: 12px 12px 0;
 }
 
 #matchedRecordsTable {
@@ -1370,4 +1370,38 @@ button:active {
     background: linear-gradient(180deg, #3BC982, #279B62);
     border-color: #5DDA99;
     box-shadow: 0 7px 16px rgba(47, 182, 115, 0.22);
+}
+.xiq-drop-zone:hover {
+    border-color: #62D1D1;
+    background: linear-gradient(180deg, rgba(20, 51, 76, 0.76), rgba(13, 34, 53, 0.82));
+}
+
+.total-weight {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    min-height: 40px;
+    padding: 7px 12px;
+
+    background: #0B1A1D;
+    border: 1px solid #31575A;
+    border-radius: 7px;
+}
+
+.total-weight-label {
+    color: var(--muted);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.total-weight-value {
+    min-width: 55px;
+
+    color: #75DEDE;
+    font-size: 17px;
+    font-weight: 750;
+
+    text-align: right;
+    font-variant-numeric: tabular-nums;
 }
