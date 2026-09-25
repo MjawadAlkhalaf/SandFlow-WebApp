@@ -891,9 +891,12 @@ async function match_xiq() {
     //collecting response
     result = await response.json();
 
+    // returning function in case no columns were read from uploaded csv
     if (result.success === false) {
+
         alert(result.error);
         return;
+    
     };
 
     console.log(result);
@@ -1321,4 +1324,30 @@ function populateWithXIQ() {
     document.getElementById("editSandflowPo").value = xiqRow.PO;
 }
 
+
+table.on("rangeChanged",function(selected){
+
+    let sum = 0
+
+    let selectedCells = selected.getCells();
+
+
+   for (let row of selectedCells) {
+        for (let cell of row) {
+
+            if (cell.getColumn().getField() === "weight") {
+
+                console.log(cell.getValue());
+
+                sum += Number(cell.getValue());
+            };
+
+        }
+            
+    };
+    console.log(sum);
+    document.getElementById("totalWeight").textContent = sum.toLocaleString('en-US');
+
+
+});
 
