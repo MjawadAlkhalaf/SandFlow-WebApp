@@ -891,6 +891,11 @@ async function match_xiq() {
     //collecting response
     result = await response.json();
 
+    if (result.success === false) {
+        alert(result.error);
+        return;
+    };
+
     console.log(result);
 
     //  Open Match Review 
