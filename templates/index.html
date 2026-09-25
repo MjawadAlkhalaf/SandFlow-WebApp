@@ -142,6 +142,11 @@
         <div class="results-header">
             <h2>Results</h2>
 
+            <div class="total-weight">
+                <span class="total-weight-label">Weight Sum: </span>
+                <span class="total-weight-value" id="totalWeight">0</span>
+            </div>
+
             <div class="results-actions">
                 <button id="clearTable" type="button" class="button-secondary">🗑️ Clear Table</button>
                 <button id="Validate Tickets" type="button"><span class="check-icon">✓</span> Validate Tickets</button>
@@ -297,9 +302,6 @@
                             <h3>SandFlow vs xIQ</h3>
                         </div>
 
-                        <span id="selectedCandidateScore" class="candidate-score-badge">
-                            Score —
-                        </span>
                     </div>
 
 
@@ -375,13 +377,31 @@
 
                     <div class="match-comparison-actions">
                         <span class="refresh-helper">Edit SandFlow values above, then retry the match.</span>
-                        <button type="button" class="use-xiq-values">Use xIQ Values</button>
+                        <button type="button" class="use-xiq-values" id="use-xiq">Use xIQ Values</button>
                         <button id="refreshMatch" type="button">Refresh Match</button>
                     </div>
 
                 </section>
 
             </div>
+
+
+            <!-- Confirmed matches -->
+            <section class="match-review-card matched-records-card">
+                <div class="match-card-heading">
+                    <div>
+                        <p class="match-card-kicker">Confirmed</p>
+                        <h3>Matched Records</h3>
+                    </div>
+
+                    <span class="match-helper-text">
+                        Automatic exact matches and corrected tickets.
+                    </span>
+                </div>
+
+                <div id="matchedRecordsTable"></div>
+            </section>
+
 
 
             <!-- Bottom section: row-click workflow -->
@@ -423,22 +443,6 @@
 
             </div>
 
-
-            <!-- Confirmed matches -->
-            <section class="match-review-card matched-records-card">
-                <div class="match-card-heading">
-                    <div>
-                        <p class="match-card-kicker">Confirmed</p>
-                        <h3>Matched Records</h3>
-                    </div>
-
-                    <span class="match-helper-text">
-                        Automatic exact matches and corrected tickets.
-                    </span>
-                </div>
-
-                <div id="matchedRecordsTable"></div>
-            </section>
 
 
             <div class="match-review-footer">
