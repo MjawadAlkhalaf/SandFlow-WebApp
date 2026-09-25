@@ -4,9 +4,14 @@ from difflib import SequenceMatcher
 #Reading xiq export
 def readcsv(csvFile):
 
+    #relevant columns
+
+    req_columns = ['order_id','sand_ticket_no','driver_weight',
+                                         'loading_site_name','stage','po','sand_type_name','carrier_name','truck','status']
+
     ##reading and selecting required columns
-    xiq_df = pd.read_csv(csvFile, usecols=['order_id','sand_ticket_no','driver_weight',
-                                         'loading_site_name','stage','po','sand_type_name','carrier_name','truck','status'])
+    xiq_df = pd.read_csv(csvFile, usecols=lambda x: x in req_columns)
+
     return xiq_df
 
 #standerdizing the dataframes for easier comparison
@@ -239,6 +244,18 @@ def match_xiq(csvFile, currTable):
 
     xiq_df = readcsv(csvFile)
 
+    if xiq_df.empty:
+
+        return {
+            "success": False,
+            "error": "Invalid CSV File",
+            "candidates": [],
+            "duplicates": [],
+            "matched_with_order": [],
+            "matched_csv": [],
+            "unmatched_table_tickets": []
+        }
+
     normal_csv, normal_table = normalizer(xiq_df, currTable)
 
     matched_table_df, unmatched_table_df = matched_table(
@@ -305,6 +322,7 @@ def match_xiq(csvFile, currTable):
     unmatched_json = (unmatched_table_df.astype(object).where(pd.notna(unmatched_table_df), None).to_dict(orient="records"))
 
     return {
+        "success": True,
         "candidates": candidates_json,
         "duplicates": duplicates,
         "matched_with_order": matched_json,
