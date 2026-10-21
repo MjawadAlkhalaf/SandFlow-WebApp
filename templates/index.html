@@ -151,6 +151,13 @@
                 <button id="clearTable" type="button" class="button-secondary">🗑️ Clear Table</button>
                 <button id="Validate Tickets" type="button"><span class="check-icon">✓</span> Validate Tickets</button>
                 <button id="generateCSV" type="button">Generate CSV</button>
+                <button id="saveVerified" type="button" class="button-secondary save-verified-button" title="Send reviewed ticket fields for training">
+                    <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 4h13l3 3v13H4z"></path>
+                        <path d="M8 4v6h8V4M8 20v-7h8v7"></path>
+                    </svg>
+                    Save Verified
+                </button>
             </div>
         </div>
 
@@ -399,7 +406,9 @@
                     </span>
                 </div>
 
-                <div id="matchedRecordsTable"></div>
+                <div class="matched-table-resizer" title="Drag the bottom edge to resize the matched records table">
+                    <div id="matchedRecordsTable"></div>
+                </div>
             </section>
 
 
@@ -464,6 +473,8 @@
 
 <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
 <script src="/static/app.js"></script>
+
+
 
 </body>
 </html>
