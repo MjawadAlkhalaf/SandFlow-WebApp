@@ -1,5 +1,5 @@
 from pathlib import Path
-from fastapi import FastAPI, UploadFile, File, Request
+from fastapi import FastAPI, UploadFile, File, Request,Form, Body
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 
 from ocr import read_paddle_output
+from ocr import writeRawTraining
 from parser import cleanText, parseTicket, checkForInvalid
 from processIMG import processJPEG
 import fitz
@@ -26,6 +27,27 @@ if getattr(sys, "frozen", False):
     BASE_DIR = Path(sys._MEIPASS)
 else:
     BASE_DIR = Path(__file__).resolve().parent
+
+
+if getattr(sys, "frozen", False):
+    APP_DIR = Path(sys.executable).resolve().parent
+else:
+    APP_DIR = Path(__file__).resolve().parent
+
+train_raw_file = APP_DIR / "SandFlow_RawTrainingData.json"
+
+def saveRawTraining(raw_ticket):
+
+    if train_raw_file.exists():
+        with open(train_raw_file, "r", encoding="utf-8") as file:
+            training_data = json.load(file)
+    else:
+        training_data = []
+
+    training_data.append(raw_ticket)
+
+    with open(train_raw_file, "w", encoding="utf-8") as file:
+        json.dump(training_data, file, indent=4)
 
 
 app = FastAPI()
@@ -49,6 +71,8 @@ templates = Jinja2Templates(
 upload_path = Path("uploads")
 
 upload_path.mkdir(exist_ok=True)
+
+print("UPLOAD DIRECTORY:", upload_path.resolve())
 app.mount(
     "/uploads",
     StaticFiles(directory=str(upload_path)),
@@ -76,10 +100,6 @@ async def process_ticket(file: UploadFile = File(...)):
     # Read uploaded file as bytes
     contents = await file.read()
 
-    save_path = upload_path / file.filename
-
-    with open(save_path, "wb") as f:
-        f.write(contents)
 
     file_extension = Path(file.filename).suffix.lower()
 
@@ -116,7 +136,7 @@ async def process_ticket(file: UploadFile = File(...)):
 
             mod_img = processJPEG(img)
 
-            ticket_text = read_paddle_output(mod_img)
+            ticket_text, ocr_features = read_paddle_output(mod_img)
 
             cleaned_text = cleanText(ticket_text)
 
@@ -129,27 +149,28 @@ async def process_ticket(file: UploadFile = File(...)):
                     for i in temp:
                         if i.startswith("1"):
                             ticket["bol"] = i
-                                
+
+            # Generate training record and UUID
+            ticket["source"] = ""
+            raw_ticket_train = writeRawTraining(cleaned_text, ticket, ocr_features)
+
+            training_id = raw_ticket_train["id"]
+            image_filename = f"{training_id}.png"
+            image_path = upload_path / image_filename
+
+            # Save this PDF page as a processed PNG image
+            if not cv2.imwrite(str(image_path), mod_img):
+                raise RuntimeError("Failed to save PDF page image")
+
+            # Use the same image for preview and training
+            ticket["source"] = f"/uploads/{image_filename}"
+            raw_ticket_train["source"] = ticket["source"]
+
+            saveRawTraining(raw_ticket_train)
+            ticket["training_id"] = training_id
 
             invalid = checkForInvalid(ticket)
-
-            # Create a new PDF containing only this page
-            single_page_doc = fitz.open()
-
-            single_page_doc.insert_pdf(
-                doc,
-                from_page=page_number - 1,
-                to_page=page_number - 1
-            )
-
-            page_filename = (
-                f"{Path(file.filename).stem}_page_{page_number}.pdf"
-            )
-
-            page_path = upload_path / page_filename
-
-            single_page_doc.save(page_path)
-            single_page_doc.close()
+            
 
             
             tickets.append({
@@ -157,7 +178,7 @@ async def process_ticket(file: UploadFile = File(...)):
                 "ticket_text": ticket_text,
                 "ticket": ticket,
                 "invalid": invalid,
-                "source_url": f"/uploads/{page_filename}"
+                "source_url": ticket["source"]
             })
 
         return {
@@ -177,7 +198,7 @@ async def process_ticket(file: UploadFile = File(...)):
         mod_img = processJPEG(img)
 
         #Read ocr output
-        ticket_text = read_paddle_output(mod_img)
+        ticket_text, ocr_features = read_paddle_output(mod_img)
 
         cleaned_text = cleanText(ticket_text)
 
@@ -192,14 +213,37 @@ async def process_ticket(file: UploadFile = File(...)):
                     if i.startswith("1"):
                         ticket["bol"] = i
 
+        # Generate training record and UUID
+        ticket["source"] = ""
+        raw_ticket_train = writeRawTraining(cleaned_text, ticket, ocr_features)
+
+        #ticket unique id generated and saved image name to match id
+        training_id = raw_ticket_train["id"]
+        image_filename = f"{training_id}.png"
+        image_path = upload_path / image_filename
+
+        # Save processed image
+        if not cv2.imwrite(str(image_path), mod_img):
+            raise RuntimeError("Failed to save ticket image")
+
+        # Use the same image for preview and training
+        ticket["source"] = f"/uploads/{image_filename}"
+        raw_ticket_train["source"] = ticket["source"]
+
+        #appending raw training json with ticket info
+        saveRawTraining(raw_ticket_train)
+
+        #setting ticket id to generated id
+        ticket["training_id"] = training_id
+
         invalid = checkForInvalid(ticket)
 
         return {
-            "filename": file.filename,
+            "filename": image_filename,
             "ticket_text": ticket_text,
             "ticket": ticket,
             "invalid": invalid,
-            "source_url": f"/uploads/{file.filename}"
+            "source_url": ticket['source']
         }
 class SaveTicketsRequest(BaseModel):
 
@@ -332,6 +376,7 @@ def generate_csv(data: SaveTicketsRequest):
         "csv": csv_output.getvalue()
     }
 
+
 #Matching entered tickets to xiq
 @app.post("/match-xiq-csv")
 async def match_xiq_export(xiq_export: UploadFile = File(...),currentTable: str = Form(...)):
@@ -344,6 +389,33 @@ async def match_xiq_export(xiq_export: UploadFile = File(...),currentTable: str 
     results = match_xiq(xiq_file,table_df)
 
     return results
+
+@app.post("/send-verified-training")
+async def send_verified_training(verTickets: list[dict] = Body(..., embed=True)):
+
+    with open(train_raw_file, 'r', encoding='utf-8') as file:
+        train_data = json.load(file)
+
+    for verTicket  in verTickets:
+        for rawTicket in train_data:
+            
+            if rawTicket['id'] == verTicket['training_id']:
+
+                rawTicket['verified_bol'] = verTicket['bol']
+                rawTicket['verified_weight'] = verTicket['weight']
+                rawTicket['verified_po'] = verTicket['po']
+                rawTicket['verified_truck'] = verTicket['truck']
+                rawTicket['verified_carrier'] = verTicket['carrier']
+                rawTicket['verified_facility'] = verTicket['facility']
+
+                break
+        
+
+    with open(train_raw_file, "w", encoding="utf-8") as file:
+            json.dump(train_data, file, indent=4)
+
+    return {"success" : True}
+
 
 
 if __name__ == "__main__":
