@@ -41,7 +41,7 @@ def read_paddle_output(ticket_upload):
 def writeRawTraining(ticket_text, ticket, ocr_features):
 
 
-    newData = {'id' : uuid.uuid4().int,
+    newData = {'id' : uuid.uuid4().hex[:12],
                 
                 'raw_text' : ticket_text,
                 'raw_carrier': ticket['carrier'],
