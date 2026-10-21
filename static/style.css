@@ -1405,3 +1405,48 @@ button:active {
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
+
+
+/* xIQ Match Review: taller, vertically resizable Matched Records table */
+.matched-table-resizer {
+    height: 380px;
+    min-height: 180px;
+    max-height: 75vh;
+    resize: vertical;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+#matchedRecordsTable.tabulator {
+    height: 100% !important;
+    min-height: 0;
+    border: 0;
+}
+
+/* Compact unmatched/candidate tables to leave more room for confirmed matches */
+.match-review-bottom .match-table-card {
+    min-height: 0;
+}
+
+#unmatchedSandflowTable.tabulator,
+#candidateTable.tabulator {
+    height: 165px !important;
+    min-height: 0;
+}
+
+/* Compact secondary action for verified training records */
+.results-actions .save-verified-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 0 14px;
+    white-space: nowrap;
+    font-size: 13px;
+}
+.results-actions .save-verified-button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
