@@ -449,6 +449,8 @@ function addTicketRow(
 
     table.addRow({
 
+        training_id: ticket.training_id,
+        
         silo: silo,
 
         sandType: sandType,
@@ -780,6 +782,29 @@ function closeValidation() {
     validationModal.style.display = "none";
     // optional: clear the preview
     document.getElementById("validationSource").src = "";
+}
+
+const saveVerified = document.getElementById("saveVerified");
+saveVerified.addEventListener("click", verifiedTrain);
+
+async function verifiedTrain() {
+
+    // getting verified fields for training
+    const verTickets = table.getData();
+
+    // fallback when button is clicked while table is empty
+    if (verTickets.length === 0){
+        alert("No Tickets Found To Save")
+        return;
+    }
+
+    const response = await fetch("/send-verified-training", {
+
+        method : "POST",
+        headers: { "Content-Type": "application/json"},
+        body : JSON.stringify({verTickets})
+    })
+    
 }
 
 //////////// CSV Ticket matching
@@ -1324,20 +1349,22 @@ function populateWithXIQ() {
     document.getElementById("editSandflowPo").value = xiqRow.PO;
 }
 
-
+// Function to calculate weight sum as user selects a range of cells
 table.on("rangeChanged",function(selected){
 
     let sum = 0
 
+    // getting cell objects
     let selectedCells = selected.getCells();
 
-
+    // looping through rows selected
    for (let row of selectedCells) {
+
+    //looping through the cells in each row
         for (let cell of row) {
 
+            // only calculate if weight column is selected
             if (cell.getColumn().getField() === "weight") {
-
-                console.log(cell.getValue());
 
                 sum += Number(cell.getValue());
             };
@@ -1345,7 +1372,7 @@ table.on("rangeChanged",function(selected){
         }
             
     };
-    console.log(sum);
+    // assign label
     document.getElementById("totalWeight").textContent = sum.toLocaleString('en-US');
 
 
