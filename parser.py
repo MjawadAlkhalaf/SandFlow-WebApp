@@ -161,7 +161,7 @@ def getFacility(ticket, bol):
         return "US Silica"
     elif "csp-permian" in ticket:
         return "CSP-Permian"
-    elif "Freedon Proppant" in ticket:
+    elif "freedom proppant" in ticket:
         return "Freedom Proppant"
     else:
         return "null"
