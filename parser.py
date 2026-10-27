@@ -163,6 +163,8 @@ def getFacility(ticket, bol):
         return "CSP-Permian"
     elif "freedom proppant" in ticket:
         return "Freedom Proppant"
+    elif "wallstreet compnay" in ticket:
+        return "Wallstreet Sand"
     else:
         return "null"
 
